@@ -1,0 +1,19 @@
+#!/bin/bash
+
+APP="$1"
+CONFIG_PATH=".dokku"
+APP_PATH="/home/dokku/$APP"
+TMPDIR=$(mktemp -d)
+
+echo "-----> Copying any files from app's '${CONFIG_PATH}' directory to ${APP_PATH}..."
+
+cd "$TMPDIR" && git clone "$APP_PATH" . > /dev/null 2>&1
+
+if [ -d "$CONFIG_PATH" ] ; then
+	echo -n "-----> '${CONFIG_PATH}' directory found. Copying files..."
+	cp -r "$CONFIG_PATH"/* "$APP_PATH"/
+	echo " OK."
+else
+  echo -n "-----> '${CONFIG_PATH}' directory not found. Moving on..."
+fi
+trap "rm -rf '$TMPDIR'" SIGHUP SIGINT SIGTERM
